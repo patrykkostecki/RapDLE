@@ -15,6 +15,7 @@ class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
   double _scrollPosition = 0;
   double _opacity = 0;
+  int screenState = 0;
   String path = '/Users/a1234/Desktop/Aplikacje/RapDLE/rapdle/assets';
 
   _scrollListener() {
@@ -36,44 +37,72 @@ class _HomePageState extends State<HomePage> {
         ? _scrollPosition / (screenSize.height * 0.40)
         : 1;
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-          preferredSize: Size(screenSize.width, 70),
-          child: TopBarContents(_opacity)),
-      backgroundColor: Color(0xFFC9C5CA),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Container(
-                  child: SizedBox(
-                    height: screenSize.height * 0.75,
-                    width: screenSize.width,
-                    child: Image.asset(
-                      path + '/background.png',
-                      // fit: BoxFit.cover,
+    return WillPopScope(
+      onWillPop: () async {
+        // Resetuj screenState do 0
+        setState(() {
+          screenState = 0;
+        });
+        // Zwracając false, zapobiegasz wykonaniu akcji powrotu (pop)
+        return false;
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: PreferredSize(
+            preferredSize: Size(screenSize.width, 70),
+            child: TopBarContents(_opacity)),
+        backgroundColor: Color(0xFFC9C5CA),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Container(
+                    child: SizedBox(
+                      height: screenSize.height * 0.75,
+                      width: screenSize.width,
+                      child: Image.asset(
+                        path + '/background.png',
+                        // fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
-                Column(
-                  children: [
-                    FloatingQuickAccessBar(screenSize: screenSize),
-                    SizedBox(
-                      height: 50,
-                    ),
-                    FeaturedHeading(screenSize: screenSize),
-                    FeaturedTiles(screenSize: screenSize),
-                    SizedBox(
-                      height: 50,
-                    ),
-                    BottomBar(),
-                  ],
-                )
-              ],
-            ),
-          ],
+                  Column(
+                    children: [
+                      if (screenState == 0)
+                        FloatingQuickAccessBar(
+                          screenSize: screenSize,
+                          onItemTap: (index) {
+                            setState(() {
+                              screenState = index +
+                                  1; // Zaktualizuj stan na podstawie wybranego elementu
+                            });
+                          },
+                        ),
+                      if (screenState == 1 ||
+                          screenState == 2 ||
+                          screenState == 3)
+                        SizedBox(
+                          height: 50,
+                        ),
+                      if (screenState == 1) // Dla "Dźwięk"
+                        SizedBox(
+                          height: 500,
+                        ),
+                      if (screenState == 2) // Dla "Tekst"
+                        if (screenState >= 0)
+                          FeaturedHeading(screenSize: screenSize),
+                      FeaturedTiles(screenSize: screenSize),
+                      SizedBox(
+                        height: 50,
+                      ),
+                      BottomBar(),
+                    ],
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
