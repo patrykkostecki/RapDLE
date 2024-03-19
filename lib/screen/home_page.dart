@@ -4,6 +4,7 @@ import 'package:rapdle/widgets/bottom_bar.dart';
 import 'package:rapdle/widgets/featured_heading.dart';
 import 'package:rapdle/widgets/featured_tiles.dart';
 import 'package:rapdle/widgets/floating_quick_acces_bar.dart';
+import 'package:rapdle/widgets/guess_song.dart';
 import 'package:rapdle/widgets/top_bar_contest';
 
 class HomePage extends StatefulWidget {
@@ -86,9 +87,7 @@ class _HomePageState extends State<HomePage> {
                           height: 50,
                         ),
                       if (screenState == 1) // Dla "Dźwięk"
-                        SizedBox(
-                          height: 500,
-                        ),
+                        GuessTheSong(screenSize: screenSize),
                       if (screenState == 2) // Dla "Tekst"
                         if (screenState >= 0)
                           FeaturedHeading(screenSize: screenSize),

@@ -32,6 +32,20 @@
   <title>rapdle</title>
   <link rel="manifest" href="manifest.json">
 
+  <script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-storage.js"></script>
+  <script>  
+    var firebaseConfig = {
+      apiKey: "AIzaSyAcqmDgpGj2ehT7nnlC1tpRp8yu31kkS50",
+      authDomain: "rapdle.firebaseapp.com",
+      projectId: "rapdle",
+      storageBucket: "rapdle.appspot.com",
+      messagingSenderId: "11241716983",
+      appId: "1:11241716983:web:79b6e38d410174410127f2",
+      measurementId: "G-XRZFEZQL4H"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
   <script>
     // The value below is injected by flutter build, do not touch.
     const serviceWorkerVersion = null;
