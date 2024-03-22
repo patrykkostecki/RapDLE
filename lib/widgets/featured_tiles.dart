@@ -10,9 +10,9 @@ class FeaturedTiles extends StatelessWidget {
   final Size screenSize;
 
   final List<String> assets = [
-    '/Users/a1234/Desktop/Aplikacje/RapDLE/rapdle/assets/pgs.jpeg',
-    '/Users/a1234/Desktop/Aplikacje/RapDLE/rapdle/assets/kukon.jpeg',
-    '/Users/a1234/Desktop/Aplikacje/RapDLE/rapdle/assets/asster.jpeg',
+    'assets/pgs.jpeg',
+    'assets/kukon.jpeg',
+    'assets/asster.jpeg',
   ];
 
   final List<String> title = [
