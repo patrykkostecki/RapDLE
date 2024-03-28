@@ -5,6 +5,7 @@ import 'package:rapdle/widgets/featured_heading.dart';
 import 'package:rapdle/widgets/featured_tiles.dart';
 import 'package:rapdle/widgets/floating_quick_acces_bar.dart';
 import 'package:rapdle/widgets/guess_song.dart';
+import 'package:rapdle/widgets/lose_screen.dart';
 import 'package:rapdle/widgets/top_bar_contest';
 
 class HomePage extends StatefulWidget {
@@ -18,6 +19,7 @@ class _HomePageState extends State<HomePage> {
   double _opacity = 0;
   int screenState = 0;
   String path = '/Users/a1234/Desktop/Aplikacje/RapDLE/rapdle/assets';
+  bool hasLost = false;
 
   _scrollListener() {
     setState(() {
@@ -86,11 +88,31 @@ class _HomePageState extends State<HomePage> {
                         SizedBox(
                           height: 50,
                         ),
-                      if (screenState == 1) // Dla "Dźwięk"
-                        GuessTheSong(screenSize: screenSize),
-                      if (screenState == 2) // Dla "Tekst"
-                        if (screenState >= 0)
-                          FeaturedHeading(screenSize: screenSize),
+                      if (screenState == 1)
+                        if (hasLost == false) // Dla "Dźwięk"
+                          GuessTheSong(
+                            screenSize: screenSize,
+                            onLose: (bool value) {
+                              setState(() {
+                                hasLost = value;
+                              });
+                            },
+                          ),
+                      if (hasLost == true)
+                        LoseScreen(
+                          songName: 'Nazwa utworu',
+                          imagePath: 'URL obrazu',
+                          onRetry: () {
+                            setState(() {
+                              hasLost = false;
+                              screenState =
+                                  0; // Wróć do początkowego stanu/ekranu
+                            });
+                          },
+                        ),
+                      //   // Dla "Tekst"
+                      if (screenState >= 0)
+                        FeaturedHeading(screenSize: screenSize),
                       FeaturedTiles(screenSize: screenSize),
                       SizedBox(
                         height: 50,
