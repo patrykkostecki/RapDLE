@@ -5,7 +5,7 @@ import 'package:rapdle/widgets/featured_heading.dart';
 import 'package:rapdle/widgets/featured_tiles.dart';
 import 'package:rapdle/widgets/floating_quick_acces_bar.dart';
 import 'package:rapdle/widgets/guess_song.dart';
-import 'package:rapdle/widgets/lose_screen.dart';
+import 'package:rapdle/screen/lose_screen.dart';
 import 'package:rapdle/widgets/top_bar_contest';
 
 class HomePage extends StatefulWidget {

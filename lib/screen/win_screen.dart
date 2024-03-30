@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:rapdle/widgets/responsive.dart';
+import 'package:lottie/lottie.dart';
 
-class LoseScreen extends StatelessWidget {
+class WinScreen extends StatelessWidget {
   final String songName;
   final String imagePath;
   final VoidCallback onRetry;
 
-  const LoseScreen({
+  const WinScreen({
     Key? key,
     required this.songName,
     required this.imagePath,
@@ -38,7 +39,7 @@ class LoseScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Przegrałeś',
+                  'Wygrałeś',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -46,12 +47,14 @@ class LoseScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenSize.height / 20),
-                Image.network(
-                  imagePath,
-                  width: 300,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
+                Lottie.asset('WinAnimation.json', repeat: false),
+
+                // Image.network(
+                //   imagePath,
+                //   width: 300,
+                //   height: 200,
+                //   fit: BoxFit.cover,
+                // ),
                 SizedBox(height: screenSize.height / 20),
                 Text(
                   songName,
@@ -63,7 +66,7 @@ class LoseScreen extends StatelessWidget {
                 SizedBox(height: screenSize.height / 20),
                 ElevatedButton(
                   onPressed: onRetry,
-                  child: Text('Spróbuj ponownie'),
+                  child: Text('Kolejna Piosenka!'),
                 ),
               ],
             ),

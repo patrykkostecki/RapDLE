@@ -1,12 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:rapdle/widgets/lose_screen.dart';
+import 'package:flutter/services.dart';
+import 'package:rapdle/screen/lose_screen.dart';
+import 'package:rapdle/screen/win_screen.dart';
 import 'package:rapdle/widgets/responsive.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:rapdle/screen/home_page.dart';
+import 'package:lottie/lottie.dart';
 
 class GuessTheSong extends StatefulWidget {
   const GuessTheSong({Key? key, required this.screenSize, required this.onLose})
@@ -19,18 +22,27 @@ class GuessTheSong extends StatefulWidget {
   _GuessTheSongState createState() => _GuessTheSongState();
 }
 
-class _GuessTheSongState extends State<GuessTheSong> {
+class _GuessTheSongState extends State<GuessTheSong>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final AudioPlayer audioPlayer = AudioPlayer();
-  String _currentSongName =
-      ""; // Zmienna przechowująca nazwę aktualnej piosenki
-  String _message = ""; // Wiadomość dla użytkownika
+  String _currentSongName = "";
+  String _message = "";
   int _attempts = 0;
+  AnimationController? _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController =
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
+  }
 
   @override
   void dispose() {
     _textController.dispose();
     audioPlayer.dispose();
+    _animationController?.dispose();
     super.dispose();
   }
 
@@ -39,12 +51,17 @@ class _GuessTheSongState extends State<GuessTheSong> {
       final url = await FirebaseStorage.instance.ref(filePath).getDownloadURL();
       await audioPlayer.play(UrlSource(url));
       Timer(Duration(seconds: _attempts + 1), () async {
-        await audioPlayer.stop(); // Zatrzymuje piosenkę po 5 sekundach
+        await audioPlayer.stop();
       });
       setState(() {
-        _currentSongName = songName; // Aktualizacja nazwy aktualnej piosenki
-        _message = ""; // Wyczyszczenie poprzedniej wiadomości
+        _currentSongName = songName;
+        _message = "";
       });
+      // Uruchomienie animacji
+      _animationController!.duration = Duration(seconds: _attempts + 1);
+      _animationController!
+          .forward()
+          .whenComplete(() => _animationController!.reset());
     } catch (e) {
       print('Wystąpił błąd podczas odtwarzania piosenki: $e');
     }
@@ -53,16 +70,21 @@ class _GuessTheSongState extends State<GuessTheSong> {
   void _checkAnswer() {
     if (_textController.text.trim().toLowerCase() ==
         _currentSongName.toLowerCase()) {
-      setState(() {
-        _message = "Wygrałeś!";
-      });
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => WinScreen(
+                songName: _currentSongName,
+                imagePath: 'path/to/your/image',
+                onRetry: () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+              )));
     } else {
       setState(() {
         _attempts++;
-        if (_attempts < 5) {
-          _message = "Spróbuj jeszcze raz!";
-        } else {
+        if (_attempts >= 5) {
           widget.onLose(true);
+        } else {
+          _message = "Spróbuj jeszcze raz!";
         }
       });
     }
@@ -89,6 +111,8 @@ class _GuessTheSongState extends State<GuessTheSong> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Lottie.asset('PlayAnimation.json',
+                    width: 250, height: 250, controller: _animationController),
                 TextField(
                   controller: _textController,
                   decoration: InputDecoration(
@@ -96,23 +120,20 @@ class _GuessTheSongState extends State<GuessTheSong> {
                     border: OutlineInputBorder(),
                   ),
                 ),
-                SizedBox(height: 10), // Dodaje odstęp
+                SizedBox(height: 10),
                 Text(_message),
-                Text(
-                    'Ilość prób:  $_attempts'), // Wyświetla wiadomość dla użytkownika
+                Text('Ilość prób: $_attempts'),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
                       icon: Icon(Icons.play_arrow),
-                      onPressed: () {
-                        playSong('test.mp3',
-                            'test'); // Podaj odpowiednią nazwę piosenki
-                      },
+                      onPressed: () =>
+                          playSong('Young Leosia, bambi- PGS.mp3', 'PGS'),
                     ),
                     IconButton(
                       icon: Icon(Icons.check),
-                      onPressed: _checkAnswer, // Sprawdza odpowiedź
+                      onPressed: _checkAnswer,
                     ),
                     IconButton(
                       icon: Icon(Icons.pause),
