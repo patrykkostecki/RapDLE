@@ -16,7 +16,7 @@ class GuessTheSong extends StatefulWidget {
       : super(key: key);
 
   final Size screenSize;
-  final Function(bool) onLose;
+  final Function(int) onLose;
 
   @override
   _GuessTheSongState createState() => _GuessTheSongState();
@@ -58,7 +58,7 @@ class _GuessTheSongState extends State<GuessTheSong>
         _message = "";
       });
       // Uruchomienie animacji
-      _animationController!.duration = Duration(seconds: _attempts + 1);
+      _animationController!.duration = Duration(seconds: 1);
       _animationController!
           .forward()
           .whenComplete(() => _animationController!.reset());
@@ -70,19 +70,14 @@ class _GuessTheSongState extends State<GuessTheSong>
   void _checkAnswer() {
     if (_textController.text.trim().toLowerCase() ==
         _currentSongName.toLowerCase()) {
-      Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => WinScreen(
-                songName: _currentSongName,
-                imagePath: 'path/to/your/image',
-                onRetry: () {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
-              )));
+      setState(() {
+        widget.onLose(1);
+      });
     } else {
       setState(() {
         _attempts++;
         if (_attempts >= 5) {
-          widget.onLose(true);
+          widget.onLose(2);
         } else {
           _message = "Spróbuj jeszcze raz!";
         }

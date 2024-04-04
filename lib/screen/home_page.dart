@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rapdle/screen/win_screen.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rapdle/widgets/bottom_bar.dart';
 import 'package:rapdle/widgets/featured_heading.dart';
@@ -19,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   double _opacity = 0;
   int screenState = 0;
   String path = '/Users/a1234/Desktop/Aplikacje/RapDLE/rapdle/assets';
-  bool hasLost = false;
+  int hasLost = 0;
 
   _scrollListener() {
     setState(() {
@@ -89,27 +90,38 @@ class _HomePageState extends State<HomePage> {
                           height: 50,
                         ),
                       if (screenState == 1)
-                        if (hasLost == false) // Dla "Dźwięk"
+                        if (hasLost == 0) // Dla "Dźwięk"
                           GuessTheSong(
                             screenSize: screenSize,
-                            onLose: (bool value) {
+                            onLose: (int value) {
                               setState(() {
                                 hasLost = value;
                               });
                             },
                           ),
-                      if (hasLost == true)
+                      if (hasLost == 2)
                         LoseScreen(
                           songName: 'Nazwa utworu',
                           imagePath: 'URL obrazu',
                           onRetry: () {
                             setState(() {
-                              hasLost = false;
+                              hasLost = 0;
                               screenState =
                                   0; // Wróć do początkowego stanu/ekranu
                             });
                           },
                         ),
+                      if (hasLost == 1)
+                        WinScreen(
+                            songName: 'Nazwa utworu',
+                            imagePath: 'URL obrazu',
+                            onRetry: () {
+                              setState(() {
+                                hasLost = 0;
+                                screenState =
+                                    0; // Wróć do początkowego stanu/ekranu
+                              });
+                            }),
                       //   // Dla "Tekst"
                       if (screenState >= 0)
                         FeaturedHeading(screenSize: screenSize),
