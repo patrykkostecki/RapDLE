@@ -1,5 +1,6 @@
 import 'dart:async';
-
+import 'dart:html';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rapdle/screen/lose_screen.dart';
@@ -10,6 +11,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:rapdle/screen/home_page.dart';
 import 'package:lottie/lottie.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart'; // Dodane do używania localStorage
 
 class GuessTheSong extends StatefulWidget {
   const GuessTheSong({Key? key, required this.screenSize, required this.onLose})
@@ -36,6 +38,14 @@ class _GuessTheSongState extends State<GuessTheSong>
     super.initState();
     _animationController =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
+    Timer.periodic(Duration(minutes: 1), (Timer t) {
+      final now = DateTime.now();
+      if (now.hour == 5 && now.minute == 42) {
+        print('test2');
+        selectRandomSongDaily();
+      }
+    });
+    selectRandomSongDaily(); // Wywołanie początkowe, aby ustawić piosenkę na start.
   }
 
   @override
@@ -57,7 +67,6 @@ class _GuessTheSongState extends State<GuessTheSong>
         _currentSongName = songName;
         _message = "";
       });
-      // Uruchomienie animacji
       _animationController!.duration = Duration(seconds: 1);
       _animationController!
           .forward()
@@ -70,17 +79,56 @@ class _GuessTheSongState extends State<GuessTheSong>
   void _checkAnswer() {
     if (_textController.text.trim().toLowerCase() ==
         _currentSongName.toLowerCase()) {
-      setState(() {
-        widget.onLose(1);
-      });
+      // Należy zmienić logikę wywołania naLose na odpowiednią, np. wyświetlenie ekranu zwycięstwa
+      widget.onLose(1); // Przykład wywołania ekranu przegranej
     } else {
       setState(() {
         _attempts++;
         if (_attempts >= 5) {
-          widget.onLose(2);
+          widget.onLose(
+              2); // Przykład wywołania ekranu przegranej po przekroczeniu prób
         } else {
           _message = "Spróbuj jeszcze raz!";
+          selectRandomSongDaily();
+          print("test");
         }
+      });
+    }
+  }
+
+  Future<void> selectRandomSongDaily() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final lastPickedTimestamp = window.localStorage['lastPickedTimestamp'];
+    final lastPickedDate = lastPickedTimestamp != null
+        ? DateTime.parse(lastPickedTimestamp)
+        : null;
+    final nextSelectionDate = lastPickedDate != null
+        ? DateTime(
+                lastPickedDate.year, lastPickedDate.month, lastPickedDate.day)
+            .add(Duration(days: 1))
+        : null;
+    final selectionTime = DateTime(
+        today.year, today.month, today.day, 5, 35); // Ustawiona godzina na 5:15
+
+    if (lastPickedDate == null ||
+        (now.isAfter(selectionTime) &&
+            (nextSelectionDate == null || now.isAfter(nextSelectionDate)))) {
+      final listResult = await FirebaseStorage.instance.ref('songs').listAll();
+      final songs = listResult.items.map((item) => item.name).toList();
+      final randomSongName = songs[Random().nextInt(songs.length)];
+
+      window.localStorage['lastPickedTimestamp'] = now.toIso8601String();
+      window.localStorage['currentSongName'] = randomSongName.split('.').first;
+
+      print("Losowanie piosenki o godzinie: ${DateTime.now()}");
+
+      setState(() {
+        _currentSongName = window.localStorage['currentSongName']!;
+      });
+    } else {
+      setState(() {
+        _currentSongName = window.localStorage['currentSongName']!;
       });
     }
   }
@@ -123,8 +171,16 @@ class _GuessTheSongState extends State<GuessTheSong>
                   children: [
                     IconButton(
                       icon: Icon(Icons.play_arrow),
-                      onPressed: () =>
-                          playSong('Young Leosia, bambi- PGS.mp3', 'PGS'),
+                      onPressed: () {
+                        // Pobierz nazwę piosenki z localStorage
+                        final songName = window.localStorage['currentSongName'];
+                        if (songName != null) {
+                          // Użyj nazwy piosenki do skonstruowania ścieżki
+                          final filePath =
+                              'songs/$songName.mp3'; // Dostosuj, jeśli potrzebujesz innej struktury ścieżki
+                          playSong(filePath, songName);
+                        }
+                      },
                     ),
                     IconButton(
                       icon: Icon(Icons.check),
