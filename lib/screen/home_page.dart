@@ -7,6 +7,7 @@ import 'package:rapdle/widgets/featured_tiles.dart';
 import 'package:rapdle/widgets/floating_quick_acces_bar.dart';
 import 'package:rapdle/widgets/guess_song.dart';
 import 'package:rapdle/screen/lose_screen.dart';
+import 'package:rapdle/widgets/guess_text.dart';
 import 'package:rapdle/widgets/top_bar_contest';
 
 class HomePage extends StatefulWidget {
@@ -123,6 +124,16 @@ class _HomePageState extends State<HomePage> {
                               });
                             }),
                       //   // Dla "Tekst"
+                      if (screenState == 2)
+                        GuessTheLyrics(
+                          screenSize: screenSize,
+                          onLose: (int value) {
+                            setState(() {
+                              hasLost = value;
+                            });
+                          },
+                        ),
+
                       if (screenState >= 0)
                         FeaturedHeading(screenSize: screenSize),
                       FeaturedTiles(screenSize: screenSize),
