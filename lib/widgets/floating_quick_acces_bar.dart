@@ -83,17 +83,37 @@ class _FloatingQuickAccessBarState extends State<FloatingQuickAccessBar> {
               ? widget.screenSize.width / 12
               : widget.screenSize.width / 5,
         ),
-        child: Card(
-            elevation: 5,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Color.fromARGB(255, 90, 90, 90),
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Color(0xFFAC8115).withOpacity(0.4),
+                spreadRadius: 2,
+                blurRadius: 100,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Card(
+            color: Colors.white,
+            elevation: 0,
             child: Padding(
               padding: EdgeInsets.only(
-                  top: this.widget.screenSize.height / 50,
-                  bottom: this.widget.screenSize.height / 50),
+                top: this.widget.screenSize.height / 50,
+                bottom: this.widget.screenSize.height / 50,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: generateRowElements(),
               ),
-            )),
+            ),
+          ),
+        ),
       ),
     );
   }
