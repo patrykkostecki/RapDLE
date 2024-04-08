@@ -114,40 +114,64 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
           left: 20,
           right: 20,
         ),
-        child: Card(
-          elevation: 5,
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(_currentLyrics), // Display the selected lyrics
-                SizedBox(height: 10),
-                TextField(
-                  controller: _textController,
-                  decoration: InputDecoration(
-                    hintText: "Enter song name...",
-                    border: OutlineInputBorder(),
+        child: Container(
+          width: 800,
+          height: 380,
+          // Added container for custom decoration
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Color.fromARGB(255, 90, 90, 90),
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Color(0xFFAC8115).withOpacity(0.4),
+                spreadRadius: 2,
+                blurRadius: 100,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Card(
+            color: Colors.white, // Specifying card color
+            elevation: 0, // Removed elevation to use custom shadow
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(_currentLyrics), // Display the selected lyrics
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 550,
+                    child: TextField(
+                      controller: _textController,
+                      decoration: InputDecoration(
+                        hintText: "Wpisz nazwę piosenki...",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(height: 10),
-                Text(_message),
-                Text('Attempts: $_attempts'),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.search),
-                      onPressed: () =>
-                          fetchLyrics('text/Kizo-Hero.txt', 'Hero'),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.check),
-                      onPressed: _checkAnswer,
-                    ),
-                  ],
-                ),
-              ],
+                  SizedBox(height: 10),
+                  Text(_message),
+                  Text('Ilosc Prób: $_attempts'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.search),
+                        onPressed: () =>
+                            fetchLyrics('text/Kizo-Hero.txt', 'Hero'),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.check),
+                        onPressed: _checkAnswer,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

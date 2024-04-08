@@ -37,7 +37,7 @@ class _GuessTheSongState extends State<GuessTheSong>
   void initState() {
     super.initState();
     _animationController =
-        AnimationController(vsync: this, duration: Duration(seconds: 1));
+        AnimationController(vsync: this, duration: Duration(seconds: 10));
     Timer.periodic(Duration(minutes: 1), (Timer t) {
       final now = DateTime.now();
       if (now.hour == 5 && now.minute == 42) {
@@ -67,7 +67,7 @@ class _GuessTheSongState extends State<GuessTheSong>
         _currentSongName = songName;
         _message = "";
       });
-      _animationController!.duration = Duration(seconds: 1);
+      _animationController!.duration = Duration(seconds: 10);
       _animationController!
           .forward()
           .whenComplete(() => _animationController!.reset());
@@ -147,54 +147,105 @@ class _GuessTheSongState extends State<GuessTheSong>
               ? widget.screenSize.width / 5
               : widget.screenSize.width / 5,
         ),
-        child: Card(
-          elevation: 5,
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Lottie.asset('PlayAnimation.json',
-                    width: 250, height: 250, controller: _animationController),
-                TextField(
-                  controller: _textController,
-                  decoration: InputDecoration(
-                    hintText: "Wpisz nazwę piosenki...",
-                    border: OutlineInputBorder(),
+        child: Container(
+          width: 800,
+          height: 380,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Color.fromARGB(255, 90, 90, 90),
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Color(0xFFAC8115).withOpacity(0.4),
+                spreadRadius: 2,
+                blurRadius: 100,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Card(
+            color: Colors.white,
+            elevation: 0,
+            child: Padding(
+              padding: EdgeInsets.all(10),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Lottie.asset(
+                    'PlayAnimation.json',
+                    width: 200,
+                    height: 200,
+                    controller: _animationController,
                   ),
-                ),
-                SizedBox(height: 10),
-                Text(_message),
-                Text('Ilość prób: $_attempts'),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.play_arrow),
-                      onPressed: () {
-                        // Pobierz nazwę piosenki z localStorage
-                        final songName = window.localStorage['currentSongName'];
-                        if (songName != null) {
-                          // Użyj nazwy piosenki do skonstruowania ścieżki
-                          final filePath =
-                              'songs/$songName.mp3'; // Dostosuj, jeśli potrzebujesz innej struktury ścieżki
-                          playSong(filePath, songName);
-                        }
-                      },
+                  Text(
+                    'Ilość prób: $_attempts',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, // Pogrubienie tekstu
                     ),
-                    IconButton(
-                      icon: Icon(Icons.check),
-                      onPressed: _checkAnswer,
+                  ),
+                  SizedBox(height: 5),
+                  SizedBox(
+                    width: 550,
+                    child: TextField(
+                      controller: _textController,
+                      decoration: InputDecoration(
+                        hintText: "Wpisz nazwę piosenki...",
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.pause),
-                      onPressed: () {
-                        audioPlayer.pause();
-                      },
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                  Text(_message),
+                  SizedBox(height: 1),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          final songName =
+                              window.localStorage['currentSongName'];
+                          if (songName != null) {
+                            final filePath = 'songs/$songName.mp3';
+                            playSong(filePath, songName);
+                          }
+                          // Logika przycisku odtwarzania
+                        },
+                        child: Text('Odtwórz'),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor:
+                              const Color.fromARGB(255, 0, 78, 141),
+                          textStyle: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10.0, horizontal: 20.0),
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 30), // Odstęp między przyciskami
+                      ElevatedButton(
+                        onPressed: _checkAnswer,
+                        child: Text('Zatwierdź'),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Color.fromARGB(255, 0, 99, 0),
+                          textStyle: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                ],
+              ),
             ),
           ),
         ),
