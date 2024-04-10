@@ -88,7 +88,7 @@ class _GuessTheSongState extends State<GuessTheSong>
           widget.onLose(
               2); // Przykład wywołania ekranu przegranej po przekroczeniu prób
         } else {
-          _message = "Spróbuj jeszcze raz!";
+          _message = "Błąd! Spróbuj jeszcze raz!";
           selectRandomSongDaily();
           print("test");
         }
@@ -149,7 +149,7 @@ class _GuessTheSongState extends State<GuessTheSong>
         ),
         child: Container(
           width: 800,
-          height: 380,
+          height: 400,
           decoration: BoxDecoration(
             border: Border.all(
               color: Color.fromARGB(255, 90, 90, 90),
@@ -185,6 +185,7 @@ class _GuessTheSongState extends State<GuessTheSong>
                       fontWeight: FontWeight.bold, // Pogrubienie tekstu
                     ),
                   ),
+                  Text(_message),
                   SizedBox(height: 5),
                   SizedBox(
                     width: 550,
@@ -196,8 +197,7 @@ class _GuessTheSongState extends State<GuessTheSong>
                       ),
                     ),
                   ),
-                  Text(_message),
-                  SizedBox(height: 1),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

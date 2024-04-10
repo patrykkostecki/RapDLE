@@ -21,7 +21,7 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
     with SingleTickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   String _currentLyrics = "";
-  List<String> _selectedLines = []; // Przechowuje wybrane linijki tekstu
+  List<String> _selectedLines = [];
   String _currentSongName = "";
   String _message = "";
   int _attempts = 0;
@@ -141,8 +141,34 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(_currentLyrics), // Display the selected lyrics
                   SizedBox(height: 10),
+                  Container(
+                    width: 450,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: EdgeInsets.all(10),
+                    child: Center(
+                      child: Text(
+                        _currentLyrics,
+                        textAlign: TextAlign
+                            .center, // Centrowanie tekstu wewnątrz kontenera
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    'Ilość prób: $_attempts',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, // Pogrubienie tekstu
+                    ),
+                  ),
+                  Text(_message),
+
+                  // Display the selected lyrics
+                  SizedBox(height: 5),
                   SizedBox(
                     width: 550,
                     child: TextField(
@@ -154,19 +180,43 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
                     ),
                   ),
                   SizedBox(height: 10),
-                  Text(_message),
-                  Text('Ilosc Prób: $_attempts'),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      IconButton(
-                        icon: Icon(Icons.search),
+                      ElevatedButton(
                         onPressed: () =>
                             fetchLyrics('text/Kizo-Hero.txt', 'Hero'),
+                        child: Text('Pokaż'),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor:
+                              const Color.fromARGB(255, 0, 78, 141),
+                          textStyle: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10.0, horizontal: 20.0),
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                        ),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.check),
+                      SizedBox(
+                        width: 30,
+                      ),
+                      ElevatedButton(
                         onPressed: _checkAnswer,
+                        child: Text('Zatwierdź'),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Color.fromARGB(255, 0, 99, 0),
+                          textStyle: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),
