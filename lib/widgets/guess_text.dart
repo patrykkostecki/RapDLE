@@ -99,7 +99,7 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
         if (_attempts >= 5) {
           widget.onLose(2); // Too many attempts, fail
         } else {
-          _message = "Try again!";
+          _message = "Błąd! Spróbuj jeszcze raz!";
         }
       });
     }
@@ -116,7 +116,7 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
         ),
         child: Container(
           width: 800,
-          height: 380,
+          height: 400,
           // Added container for custom decoration
           decoration: BoxDecoration(
             border: Border.all(

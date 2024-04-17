@@ -22,6 +22,7 @@ dependencies:
   audioplayers: ^5.2.1
   firebase_core: ^2.27.1
   shared_preferences: ^2.2.2
+  flutter_gif: ^0.0.4
 
 
 
@@ -43,3 +44,4 @@ flutter:
 
   assets:
     - assets/
+    - assets/gif/PlayAnimation.gif
