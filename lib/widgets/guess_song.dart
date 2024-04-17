@@ -173,8 +173,8 @@ class _GuessTheSongState extends State<GuessTheSong>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Lottie.asset(
-                    'PlayAnimation.json',
+                  Lottie.network(
+                    'https://raw.githubusercontent.com/patrykkostecki/rapDLE/main/assets/PlayAnimation.json',
                     width: 200,
                     height: 200,
                     controller: _animationController,
