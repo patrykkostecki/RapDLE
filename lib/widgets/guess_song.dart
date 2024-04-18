@@ -29,9 +29,8 @@ class GuessTheSong extends StatefulWidget {
 Future<String> loadLottieUrl() async {
   firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
-  String urlPlayAnimation = await storage
-      .ref('gs://rapdle.appspot.com/Animations/LossAnimation.json')
-      .getDownloadURL();
+  String urlPlayAnimation =
+      await storage.ref('Animations/PlayAnimation.json').getDownloadURL();
   return urlPlayAnimation;
 }
 
@@ -48,7 +47,7 @@ class _GuessTheSongState extends State<GuessTheSong>
   void initState() {
     super.initState();
     _animationController =
-        AnimationController(vsync: this, duration: Duration(seconds: 10));
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
     Timer.periodic(Duration(minutes: 1), (Timer t) {
       final now = DateTime.now();
       if (now.hour == 5 && now.minute == 42) {
@@ -78,7 +77,7 @@ class _GuessTheSongState extends State<GuessTheSong>
         _currentSongName = songName;
         _message = "";
       });
-      _animationController!.duration = Duration(seconds: 10);
+      _animationController!.duration = Duration(seconds: 1);
       _animationController!
           .forward()
           .whenComplete(() => _animationController!.reset());
@@ -185,7 +184,7 @@ class _GuessTheSongState extends State<GuessTheSong>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Lottie.network(
-                    'urlPlayAnimation',
+                    'https://raw.githubusercontent.com/patrykkostecki/rapDLE/main/assets/PlayAnimationOLD.json',
                     width: 200,
                     height: 200,
                     controller: _animationController,
