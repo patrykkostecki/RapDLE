@@ -12,6 +12,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:rapdle/screen/home_page.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart'; // Dodane do używania localStorage
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class GuessTheSong extends StatefulWidget {
   const GuessTheSong({Key? key, required this.screenSize, required this.onLose})
@@ -22,6 +23,16 @@ class GuessTheSong extends StatefulWidget {
 
   @override
   _GuessTheSongState createState() => _GuessTheSongState();
+}
+
+//FIREBASE
+Future<String> loadLottieUrl() async {
+  firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
+  String urlPlayAnimation = await storage
+      .ref('gs://rapdle.appspot.com/Animations/LossAnimation.json')
+      .getDownloadURL();
+  return urlPlayAnimation;
 }
 
 class _GuessTheSongState extends State<GuessTheSong>
@@ -174,7 +185,7 @@ class _GuessTheSongState extends State<GuessTheSong>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Lottie.network(
-                    'https://raw.githubusercontent.com/patrykkostecki/rapDLE/main/assets/PlayAnimation.json',
+                    'urlPlayAnimation',
                     width: 200,
                     height: 200,
                     controller: _animationController,
