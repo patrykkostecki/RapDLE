@@ -44,4 +44,6 @@ flutter:
 
   assets:
     - assets/
-    - assets/gif/PlayAnimation.gif
+    - assets/PlayAnimation.json
+    - assets/WinAnimation.json
+    - assets/LossAnimation.json
