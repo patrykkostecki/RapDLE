@@ -13,6 +13,8 @@ import 'package:rapdle/screen/home_page.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart'; // Dodane do używania localStorage
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GuessTheSong extends StatefulWidget {
   const GuessTheSong({Key? key, required this.screenSize, required this.onLose})
@@ -42,10 +44,12 @@ class _GuessTheSongState extends State<GuessTheSong>
   String _message = "";
   int _attempts = 0;
   AnimationController? _animationController;
+  List<String> _songNames = [];
 
   @override
   void initState() {
     super.initState();
+    fetchSongNames();
     _animationController =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
     Timer.periodic(Duration(minutes: 1), (Timer t) {
@@ -64,6 +68,16 @@ class _GuessTheSongState extends State<GuessTheSong>
     audioPlayer.dispose();
     _animationController?.dispose();
     super.dispose();
+  }
+
+  Future<void> fetchSongNames() async {
+    final listResult = await FirebaseStorage.instance.ref('songs').listAll();
+    final songNames =
+        listResult.items.map((item) => item.name.split('.').first).toList();
+
+    setState(() {
+      _songNames = songNames;
+    });
   }
 
   Future<void> playSong(String filePath, String songName) async {
@@ -146,6 +160,18 @@ class _GuessTheSongState extends State<GuessTheSong>
     }
   }
 
+// Funkcja do generowania sugestii dla autouzupełnienia
+  Future<List<String>> getSuggestions(String query) async {
+    // Filtrowanie lokalne na podstawie pobranej listy _songNames
+    List<String> matches = [];
+
+    matches.addAll(_songNames.where(
+      (song) => song.toLowerCase().contains(query.toLowerCase()),
+    ));
+
+    return matches;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -210,12 +236,25 @@ class _GuessTheSongState extends State<GuessTheSong>
                   SizedBox(height: 5),
                   SizedBox(
                     width: 550,
-                    child: TextField(
-                      controller: _textController,
-                      decoration: InputDecoration(
-                        hintText: "Wpisz nazwę piosenki...",
-                        border: OutlineInputBorder(),
+                    child: TypeAheadFormField(
+                      textFieldConfiguration: TextFieldConfiguration(
+                        controller: _textController,
+                        decoration: InputDecoration(
+                          hintText: "Wpisz nazwę piosenki...",
+                          border: OutlineInputBorder(),
+                        ),
                       ),
+                      suggestionsCallback: (pattern) async {
+                        return await getSuggestions(pattern);
+                      },
+                      itemBuilder: (context, suggestion) {
+                        return ListTile(
+                          title: Text(suggestion),
+                        );
+                      },
+                      onSuggestionSelected: (suggestion) {
+                        _textController.text = suggestion;
+                      },
                     ),
                   ),
                   SizedBox(height: 10),

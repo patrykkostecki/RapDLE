@@ -23,6 +23,7 @@ dependencies:
   firebase_core: ^2.27.1
   shared_preferences: ^2.2.2
   flutter_gif: ^0.0.4
+  flutter_typeahead: ^4.8.0
 
 
 
