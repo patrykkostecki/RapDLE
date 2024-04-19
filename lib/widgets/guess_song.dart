@@ -78,9 +78,12 @@ class _GuessTheSongState extends State<GuessTheSong>
         _message = "";
       });
       _animationController!.duration = Duration(seconds: 1);
-      _animationController!
-          .forward()
-          .whenComplete(() => _animationController!.reset());
+      // Uruchom animację odpowiednią liczbę razy
+      for (int i = 0; i < _attempts + 1; i++) {
+        await _animationController!.forward().whenComplete(() async {
+          _animationController!.reset();
+        });
+      }
     } catch (e) {
       print('Wystąpił błąd podczas odtwarzania piosenki: $e');
     }
@@ -159,7 +162,7 @@ class _GuessTheSongState extends State<GuessTheSong>
         ),
         child: Container(
           width: 800,
-          height: 400,
+          height: 460,
           decoration: BoxDecoration(
             border: Border.all(
               color: Color.fromARGB(255, 90, 90, 90),
@@ -183,6 +186,14 @@ class _GuessTheSongState extends State<GuessTheSong>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  Text(
+                    'Odgadnij piosenkę po dzwieku',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30,
+                        fontFamily: 'CrayonPaperDemoRegular'),
+                  ),
+                  Text('Masz na to tylko 5 prób'),
                   Lottie.network(
                     'https://raw.githubusercontent.com/patrykkostecki/rapDLE/main/assets/PlayAnimationOLD.json',
                     width: 200,

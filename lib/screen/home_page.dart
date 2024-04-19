@@ -135,7 +135,10 @@ class _HomePageState extends State<HomePage> {
                         ),
 
                       if (screenState >= 0)
-                        FeaturedHeading(screenSize: screenSize),
+                        SizedBox(
+                          height: 150,
+                        ),
+                      FeaturedHeading(screenSize: screenSize),
                       FeaturedTiles(screenSize: screenSize),
                       SizedBox(
                         height: 50,

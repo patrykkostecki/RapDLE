@@ -56,9 +56,11 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
             lyricsUtf8.split('\n').where((line) => line.isNotEmpty).toList();
 
         // Losowanie indeksu początkowego dla fragmentu 4 linijek tekstu
-        int startIndex = _random
-            .nextInt(lines.length - 4); // -4 aby uniknąć przekroczenia zakresu
-        _selectedLines = lines.sublist(startIndex, startIndex + 4);
+        for (int i = 1; i <= _attempts + 1; i++) {
+          int startIndex = _random.nextInt(
+              lines.length - 4); // -4 aby uniknąć przekroczenia zakresu
+          _selectedLines = lines.sublist(startIndex, startIndex + i);
+        }
 
         setState(() {
           _currentLyrics = _selectedLines
@@ -96,7 +98,7 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
     } else {
       setState(() {
         _attempts++;
-        if (_attempts >= 5) {
+        if (_attempts >= 4) {
           widget.onLose(2); // Too many attempts, fail
         } else {
           _message = "Błąd! Spróbuj jeszcze raz!";
@@ -116,7 +118,7 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
         ),
         child: Container(
           width: 800,
-          height: 400,
+          height: 420,
           // Added container for custom decoration
           decoration: BoxDecoration(
             border: Border.all(
@@ -141,6 +143,14 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  Text(
+                    'Odgadnij tekst piosenkii',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30,
+                        fontFamily: 'CrayonPaperDemoRegular'),
+                  ),
+                  Text('Masz na to tylko 4 próby'),
                   SizedBox(height: 10),
                   Container(
                     width: 450,

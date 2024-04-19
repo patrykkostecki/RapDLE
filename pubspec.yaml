@@ -42,8 +42,18 @@ flutter:
 
   uses-material-design: true
 
+  fonts:
+  - family: CrayonPaperDemoRegular
+    fonts:
+      - asset: assets/fonts/CrayonPaperDemoRegular.ttf
+  - family: MiniBananaDemoRegular
+    fonts:
+      - asset: assets/fonts/MiniBananaDemoRegular.ttf
   assets:
     - assets/
     - assets/PlayAnimation.json
     - assets/WinAnimation.json
     - assets/LossAnimation.json
+    - assets/fonts/CrayonPaperDemoRegular.ttf
+    - assets/fonts/MiniBananaDemoRegular.ttf
+    

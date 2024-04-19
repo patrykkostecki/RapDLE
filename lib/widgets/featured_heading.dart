@@ -22,17 +22,19 @@ class FeaturedHeading extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Text(
-            'Najnowsze płyty!',
+            'Najnowsze plyty',
             style: TextStyle(
                 fontSize: 36,
-                fontFamily: 'Raleway',
+                fontFamily: 'MiniBananaDemoRegular',
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF263b5e)),
+                color: Color(0xFF000000)),
           ),
           Expanded(
             child: Text(
-              'Najnowsze płyty w tym tygodniu',
+              'Zobacz co dodalismy w tym tygodniu',
               textAlign: TextAlign.end,
+              style:
+                  TextStyle(fontFamily: 'MiniBananaDemoRegular', fontSize: 20),
             ),
           ),
         ],
