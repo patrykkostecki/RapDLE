@@ -40,11 +40,11 @@ class _TopBarContentsState extends State<TopBarContents> {
                   children: [
                     SizedBox(width: screenSize.width/10,),
                     Text(
-                      'rapDLE',
+                      'RAPdle',
                       style: TextStyle(
                         color: Color(0xFF424C55),
-                        fontSize: 24,
-                        fontFamily: 'Raleway',
+                        fontSize: 28,
+                        fontFamily: 'MiniBananaDemoRegular',
                         fontWeight: FontWeight.w900,
                         letterSpacing: 3,
                       ),
@@ -63,13 +63,14 @@ class _TopBarContentsState extends State<TopBarContents> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'popDLE',
+                            'POPdle',
                             style: TextStyle(
                                 color: _isHovering[0]
                                     ? Color(0xFF424C55)
                                     : Color(0xFF424C55),
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16
+                                fontSize: 15,
+                                fontFamily: 'MiniBananaDemoRegular',
                             ),
                           ),
                           SizedBox(height: 5),
@@ -101,13 +102,14 @@ class _TopBarContentsState extends State<TopBarContents> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'rockDLE',
+                            'ROCKdle',
                             style: TextStyle(
                                 color: _isHovering[1]
                                     ? Color(0xFF424C55)
                                     : Color(0xFF424C55),
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16
+                                fontSize: 15,
+                                fontFamily: 'MiniBananaDemoRegular',
                             ),
                           ),
                           SizedBox(height: 5),
