@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 
 class GuessTheLyrics extends StatefulWidget {
@@ -27,10 +28,12 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
   int _attempts = 0;
   AnimationController? _animationController;
   final _random = Random();
+  List<String> _textNames = [];
 
   @override
   void initState() {
     super.initState();
+    fetchTextNames();
     _animationController =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
     Firebase.initializeApp();
@@ -41,6 +44,28 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
     _textController.dispose();
     _animationController?.dispose();
     super.dispose();
+  }
+
+  // Funkcja do generowania sugestii dla autouzupełnienia
+  Future<List<String>> getSuggestions(String query) async {
+    // Filtrowanie lokalne na podstawie pobranej listy _textNames
+    List<String> matches = [];
+
+    matches.addAll(_textNames.where(
+      (text) => text.toLowerCase().contains(query.toLowerCase()),
+    ));
+
+    return matches;
+  }
+
+  Future<void> fetchTextNames() async {
+    final listResult = await FirebaseStorage.instance.ref('text').listAll();
+    final textNames =
+        listResult.items.map((item) => item.name.split('.').first).toList();
+
+    setState(() {
+      _textNames = textNames;
+    });
   }
 
   Future<void> fetchLyrics(String filePath, String songName) async {
@@ -150,7 +175,7 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
                         fontSize: 30,
                         fontFamily: 'CrayonPaperDemoRegular'),
                   ),
-                  Text('Masz na to tylko 4 próby'),
+                  Text('Masz na to tylko 4 próby!'),
                   SizedBox(height: 10),
                   Container(
                     width: 450,
@@ -181,12 +206,25 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
                   SizedBox(height: 5),
                   SizedBox(
                     width: 550,
-                    child: TextField(
-                      controller: _textController,
-                      decoration: InputDecoration(
-                        hintText: "Wpisz nazwę piosenki...",
-                        border: OutlineInputBorder(),
+                    child: TypeAheadFormField(
+                      textFieldConfiguration: TextFieldConfiguration(
+                        controller: _textController,
+                        decoration: InputDecoration(
+                          hintText: "Wpisz nazwę piosenki...",
+                          border: OutlineInputBorder(),
+                        ),
                       ),
+                      suggestionsCallback: (pattern) async {
+                        return await getSuggestions(pattern);
+                      },
+                      itemBuilder: (context, suggestion) {
+                        return ListTile(
+                          title: Text(suggestion),
+                        );
+                      },
+                      onSuggestionSelected: (suggestion) {
+                        _textController.text = suggestion;
+                      },
                     ),
                   ),
                   SizedBox(height: 10),

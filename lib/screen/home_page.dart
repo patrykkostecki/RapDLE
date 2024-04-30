@@ -5,6 +5,7 @@ import 'package:rapdle/widgets/bottom_bar.dart';
 import 'package:rapdle/widgets/featured_heading.dart';
 import 'package:rapdle/widgets/featured_tiles.dart';
 import 'package:rapdle/widgets/floating_quick_acces_bar.dart';
+import 'package:rapdle/widgets/guess_cover.dart';
 import 'package:rapdle/widgets/guess_song.dart';
 import 'package:rapdle/screen/lose_screen.dart';
 import 'package:rapdle/widgets/guess_text.dart';
@@ -90,9 +91,31 @@ class _HomePageState extends State<HomePage> {
                         SizedBox(
                           height: 50,
                         ),
-                      if (screenState == 1)
-                        if (hasLost == 0) // Dla "Dźwięk"
+                      if (screenState == 1) // Dziwek
+                        if (hasLost == 0)
                           GuessTheSong(
+                            screenSize: screenSize,
+                            onLose: (int value) {
+                              setState(() {
+                                hasLost = value;
+                              });
+                            },
+                          ),
+                      // Dla "Tekst"
+                      if (screenState == 2)
+                        if (hasLost == 0)
+                          GuessTheLyrics(
+                            screenSize: screenSize,
+                            onLose: (int value) {
+                              setState(() {
+                                hasLost = value;
+                              });
+                            },
+                          ),
+                      // Dla "Okladka"
+                      if (screenState == 3)
+                        if (hasLost == 0)
+                          GuessTheCover(
                             screenSize: screenSize,
                             onLose: (int value) {
                               setState(() {
@@ -123,16 +146,6 @@ class _HomePageState extends State<HomePage> {
                                     0; // Wróć do początkowego stanu/ekranu
                               });
                             }),
-                      //   // Dla "Tekst"
-                      if (screenState == 2)
-                        GuessTheLyrics(
-                          screenSize: screenSize,
-                          onLose: (int value) {
-                            setState(() {
-                              hasLost = value;
-                            });
-                          },
-                        ),
 
                       if (screenState >= 0)
                         SizedBox(

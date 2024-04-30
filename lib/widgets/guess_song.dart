@@ -11,10 +11,9 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:rapdle/screen/home_page.dart';
 import 'package:lottie/lottie.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart'; // Dodane do używania localStorage
+// Dodane do używania localStorage
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GuessTheSong extends StatefulWidget {
   const GuessTheSong({Key? key, required this.screenSize, required this.onLose})
@@ -54,7 +53,7 @@ class _GuessTheSongState extends State<GuessTheSong>
         AnimationController(vsync: this, duration: Duration(seconds: 1));
     Timer.periodic(Duration(minutes: 1), (Timer t) {
       final now = DateTime.now();
-      if (now.hour == 5 && now.minute == 42) {
+      if (now.hour == 0 && now.minute == 0) {
         print('test2');
         selectRandomSongDaily();
       }
@@ -136,7 +135,7 @@ class _GuessTheSongState extends State<GuessTheSong>
             .add(Duration(days: 1))
         : null;
     final selectionTime = DateTime(
-        today.year, today.month, today.day, 5, 35); // Ustawiona godzina na 5:15
+        today.year, today.month, today.day, 0, 0); // Ustawiona godzina na 5:15
 
     if (lastPickedDate == null ||
         (now.isAfter(selectionTime) &&
