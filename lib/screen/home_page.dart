@@ -36,6 +36,13 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
+  void resetGameState() {
+    setState(() {
+      hasLost = 0;
+      screenState = 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
@@ -56,7 +63,7 @@ class _HomePageState extends State<HomePage> {
         extendBodyBehindAppBar: true,
         appBar: PreferredSize(
             preferredSize: Size(screenSize.width, 70),
-            child: TopBarContents(_opacity)),
+            child: TopBarContents(_opacity, onLogoClicked: resetGameState)),
         backgroundColor: Color(0xFFC9C5CA),
         body: SingleChildScrollView(
           child: Column(
