@@ -47,7 +47,9 @@ class WinScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenSize.height / 20),
-                Lottie.asset('WinAnimation.json', repeat: false),
+                Lottie.network(
+                    'https://raw.githubusercontent.com/patrykkostecki/rapDLE/main/assets/WinAnimation.json',
+                    repeat: false),
 
                 // Image.network(
                 //   imagePath,

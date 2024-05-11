@@ -47,7 +47,9 @@ class LoseScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: screenSize.height / 20),
-                Lottie.asset('LossAnimation.json', repeat: false),
+                Lottie.network(
+                    'https://raw.githubusercontent.com/patrykkostecki/rapDLE/main/assets/LossAnimation.json',
+                    repeat: false),
 
                 // Image.network(
                 //   imagePath,

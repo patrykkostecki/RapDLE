@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:html';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class GuessTheLyrics extends StatefulWidget {
   const GuessTheLyrics(
@@ -24,6 +27,7 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
   String _currentLyrics = "";
   List<String> _selectedLines = [];
   String _currentSongName = "";
+  int _displayedLinesCount = 1;
   String _message = "";
   int _attempts = 0;
   AnimationController? _animationController;
@@ -34,6 +38,7 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
   void initState() {
     super.initState();
     fetchTextNames();
+    fetchRandomLyrics();
     _animationController =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
     Firebase.initializeApp();
@@ -68,48 +73,85 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
     });
   }
 
-  Future<void> fetchLyrics(String filePath, String songName) async {
+  Future<void> fetchRandomLyrics() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    String storedDate = prefs.getString('date') ?? '';
+    String storedLyrics = prefs.getString('lyrics') ?? '';
+    String storedSongName = prefs.getString('songName') ?? '';
+
+    if (storedDate == today &&
+        storedLyrics.isNotEmpty &&
+        storedSongName.isNotEmpty) {
+      // Jeśli data się zgadza, używamy zapisanych danych
+      setState(() {
+        _selectedLines = storedLyrics.split('\n');
+        _currentLyrics = _selectedLines
+            .take(1)
+            .join('\n'); // Tylko pierwsza linia na początku
+        _currentSongName = storedSongName;
+        _message = "";
+        _displayedLinesCount = 1; // Resetujemy licznik wyświetlanych linii
+      });
+      return;
+    }
+
     try {
-      final ref = FirebaseStorage.instance.ref(filePath);
-      final url = await ref.getDownloadURL();
-      final response = await http.get(Uri.parse(url));
+      final ref = FirebaseStorage.instance.ref('text/');
+      final result = await ref.listAll();
 
-      if (response.statusCode == 200) {
-        // Dekodowanie treści piosenki jako UTF-8.
-        final lyricsUtf8 = utf8.decode(response.bodyBytes);
-        final lines =
-            lyricsUtf8.split('\n').where((line) => line.isNotEmpty).toList();
+      if (result.items.isNotEmpty) {
+        int randomIndex = _random.nextInt(result.items.length);
+        final selectedFileRef = result.items[randomIndex];
+        final songName = selectedFileRef.name.split('.').first;
+        final url = await selectedFileRef.getDownloadURL();
+        final response = await http.get(Uri.parse(url));
 
-        // Losowanie indeksu początkowego dla fragmentu 4 linijek tekstu
-        for (int i = 1; i <= _attempts + 1; i++) {
-          int startIndex = _random.nextInt(
-              lines.length - 4); // -4 aby uniknąć przekroczenia zakresu
-          _selectedLines = lines.sublist(startIndex, startIndex + i);
+        if (response.statusCode == 200) {
+          final lyricsUtf8 = utf8.decode(response.bodyBytes);
+          final lines =
+              lyricsUtf8.split('\n').where((line) => line.isNotEmpty).toList();
+
+          int startIndex = _random.nextInt(lines.length - 4);
+          _selectedLines = lines.sublist(startIndex, startIndex + 4);
+          String selectedLyrics = _selectedLines
+              .take(1)
+              .join('\n'); // Tylko pierwsza linia na początku
+
+          setState(() {
+            _currentLyrics = selectedLyrics;
+            _currentSongName = songName;
+            _message = "";
+            _displayedLinesCount =
+                1; // Resetowanie licznika wyświetlanych linii
+          });
+
+          // Zapis do SharedPreferences
+          await prefs.setString('date', today);
+          await prefs.setString('lyrics',
+              _selectedLines.join('\n')); // Zapisujemy wszystkie linie
+          await prefs.setString('songName', songName);
+
+          _animationController!.duration = Duration(seconds: 1);
+          _animationController!
+              .forward()
+              .whenComplete(() => _animationController!.reset());
+        } else {
+          print('Failed to load lyrics');
+          setState(() {
+            _message = "Failed to load lyrics";
+          });
         }
-
-        setState(() {
-          _currentLyrics = _selectedLines
-              .join('\n'); // Łączenie wybranych linijek w jeden ciąg tekstowy
-          _currentSongName = songName;
-          _message = "";
-        });
-        // Uruchomienie animacji
-        _animationController!.duration = Duration(seconds: 1);
-        _animationController!
-            .forward()
-            .whenComplete(() => _animationController!.reset());
       } else {
-        print('Failed to load lyrics');
+        print('No lyrics files found');
         setState(() {
-          _message =
-              "Failed to load lyrics"; // Dodaj tę linię, aby wyświetlić błąd na UI
+          _message = "No lyrics files found";
         });
       }
     } catch (e) {
       print('Error fetching lyrics: $e');
       setState(() {
-        _message =
-            'Error fetching lyrics: $e'; // Ustawienie wiadomości błędu do wyświetlenia na UI
+        _message = 'Error fetching lyrics: $e';
       });
     }
   }
@@ -127,6 +169,11 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
           widget.onLose(2); // Too many attempts, fail
         } else {
           _message = "Błąd! Spróbuj jeszcze raz!";
+          if (_displayedLinesCount < _selectedLines.length) {
+            _displayedLinesCount++;
+            _currentLyrics =
+                _selectedLines.take(_displayedLinesCount).join('\n');
+          }
         }
       });
     }
@@ -176,7 +223,7 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
                         fontFamily: 'CrayonPaperDemoRegular'),
                   ),
                   Text('Masz na to tylko 4 próby!'),
-                  SizedBox(height: 10),
+                  SizedBox(height: 6),
                   Container(
                     width: 450,
                     height: 150,
@@ -231,26 +278,6 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton(
-                        onPressed: () =>
-                            fetchLyrics('text/Kizo-Hero.txt', 'Hero'),
-                        child: Text('Pokaż'),
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor:
-                              const Color.fromARGB(255, 0, 78, 141),
-                          textStyle: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 20.0),
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                          ),
-                        ),
-                      ),
                       SizedBox(
                         width: 30,
                       ),
