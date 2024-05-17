@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'dart:html' as html; // Alias dla dart:html
 
 class GuessTheCover extends StatefulWidget {
   const GuessTheCover(
@@ -33,7 +35,14 @@ class _GuessTheCoverState extends State<GuessTheCover> {
   void initState() {
     super.initState();
     fetchCoverNames();
-    selectRandomCoverDaily(); // Initial call to set the cover on start.
+    selectRandomCoverDaily();
+    Timer.periodic(Duration(minutes: 1), (Timer t) {
+      final now = DateTime.now();
+      if (now.hour == 0 && now.minute == 0) {
+        print('Changing cover at midnight');
+        selectRandomCoverDaily();
+      }
+    });
   }
 
   @override
@@ -55,18 +64,49 @@ class _GuessTheCoverState extends State<GuessTheCover> {
   }
 
   Future<void> selectRandomCoverDaily() async {
-    final listResult =
-        await firebase_storage.FirebaseStorage.instance.ref('covers').listAll();
-    final covers = listResult.items.map((item) => item.name).toList();
-    final randomCoverName = covers[Random().nextInt(covers.length)];
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final lastPickedTimestamp =
+        html.window.localStorage['lastPickedTimestampCover'];
+    final lastPickedDate = lastPickedTimestamp != null
+        ? DateTime.parse(lastPickedTimestamp)
+        : null;
+    final nextSelectionDate = lastPickedDate != null
+        ? DateTime(
+                lastPickedDate.year, lastPickedDate.month, lastPickedDate.day)
+            .add(Duration(days: 1))
+        : null;
+    final selectionTime = DateTime(today.year, today.month, today.day, 0, 0);
 
-    final url = await firebase_storage.FirebaseStorage.instance
-        .ref('covers/$randomCoverName')
-        .getDownloadURL();
-    setState(() {
-      _currentCoverName = randomCoverName.split('.').first;
-      _currentCoverUrl = url;
-    });
+    if (lastPickedDate == null ||
+        (now.isAfter(selectionTime) &&
+            (nextSelectionDate == null || now.isAfter(nextSelectionDate)))) {
+      final listResult = await firebase_storage.FirebaseStorage.instance
+          .ref('covers')
+          .listAll();
+      final covers = listResult.items.map((item) => item.name).toList();
+      final randomCoverName = covers[Random().nextInt(covers.length)];
+
+      final url = await firebase_storage.FirebaseStorage.instance
+          .ref('covers/$randomCoverName')
+          .getDownloadURL();
+
+      html.window.localStorage['lastPickedTimestampCover'] =
+          now.toIso8601String();
+      html.window.localStorage['currentCoverName'] =
+          randomCoverName.split('.').first;
+      html.window.localStorage['currentCoverUrl'] = url;
+
+      setState(() {
+        _currentCoverName = html.window.localStorage['currentCoverName']!;
+        _currentCoverUrl = html.window.localStorage['currentCoverUrl']!;
+      });
+    } else {
+      setState(() {
+        _currentCoverName = html.window.localStorage['currentCoverName']!;
+        _currentCoverUrl = html.window.localStorage['currentCoverUrl']!;
+      });
+    }
   }
 
   void _checkAnswer() {
@@ -84,8 +124,6 @@ class _GuessTheCoverState extends State<GuessTheCover> {
             blurX -= 2;
             blurY -= 2;
           }
-
-          selectRandomCoverDaily(); // Reload a new cover to guess
         }
       });
     }
@@ -189,7 +227,7 @@ class _GuessTheCoverState extends State<GuessTheCover> {
                       textFieldConfiguration: TextFieldConfiguration(
                         controller: _textController,
                         decoration: InputDecoration(
-                          hintText: "Wpisz nazwę piosenki...",
+                          hintText: "Wpisz nazwę okładki...",
                           border: OutlineInputBorder(),
                         ),
                       ),
