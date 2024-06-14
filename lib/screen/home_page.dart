@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:rapdle/screen/win_screen.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:rapdle/widgets/bottom_bar.dart';
 import 'package:rapdle/widgets/featured_heading.dart';
 import 'package:rapdle/widgets/featured_tiles.dart';
@@ -23,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   int screenState = 0;
   String path = '/Users/a1234/Desktop/Aplikacje/RapDLE/rapdle/assets';
   int hasLost = 0;
+  String currentSongName = '';
 
   _scrollListener() {
     setState(() {
@@ -52,11 +52,9 @@ class _HomePageState extends State<HomePage> {
 
     return WillPopScope(
       onWillPop: () async {
-        // Resetuj screenState do 0
         setState(() {
           screenState = 0;
         });
-        // Zwracając false, zapobiegasz wykonaniu akcji powrotu (pop)
         return false;
       },
       child: Scaffold(
@@ -76,7 +74,6 @@ class _HomePageState extends State<HomePage> {
                       width: screenSize.width,
                       child: Image.asset(
                         'assets/background.png',
-                        // fit: BoxFit.cover,
                       ),
                     ),
                   ),
@@ -87,8 +84,7 @@ class _HomePageState extends State<HomePage> {
                           screenSize: screenSize,
                           onItemTap: (index) {
                             setState(() {
-                              screenState = index +
-                                  1; // Zaktualizuj stan na podstawie wybranego elementu
+                              screenState = index + 1;
                             });
                           },
                         ),
@@ -98,62 +94,70 @@ class _HomePageState extends State<HomePage> {
                         SizedBox(
                           height: 50,
                         ),
-                      if (screenState == 1) // Dziwek
-                        if (hasLost == 0)
-                          GuessTheSong(
-                            screenSize: screenSize,
-                            onLose: (int value) {
-                              setState(() {
-                                hasLost = value;
-                              });
-                            },
-                          ),
-                      // Dla "Tekst"
-                      if (screenState == 2)
-                        if (hasLost == 0)
-                          GuessTheLyrics(
-                            screenSize: screenSize,
-                            onLose: (int value) {
-                              setState(() {
-                                hasLost = value;
-                              });
-                            },
-                          ),
-                      // Dla "Okladka"
-                      if (screenState == 3)
-                        if (hasLost == 0)
-                          GuessTheCover(
-                            screenSize: screenSize,
-                            onLose: (int value) {
-                              setState(() {
-                                hasLost = value;
-                              });
-                            },
-                          ),
-                      if (hasLost == 2)
+                      if (screenState == 1 && hasLost == 0) // GuessTheSong
+                        GuessTheSong(
+                          screenSize: screenSize,
+                          onLose: (String songName, bool isWin) {
+                            setState(() {
+                              if (isWin) {
+                                hasLost = 1;
+                              } else {
+                                hasLost = 2;
+                              }
+                              currentSongName = songName;
+                            });
+                          },
+                        ),
+                      if (screenState == 2 && hasLost == 0) // GuessTheLyrics
+                        GuessTheLyrics(
+                          screenSize: screenSize,
+                          onLose: (String songName, bool isWin) {
+                            setState(() {
+                              if (isWin) {
+                                hasLost = 1;
+                              } else {
+                                hasLost = 2;
+                              }
+                              currentSongName = songName;
+                            });
+                          },
+                        ),
+                      if (screenState == 3 && hasLost == 0) // GuessTheCover
+                        GuessTheCover(
+                          screenSize: screenSize,
+                          onLose: (String songName, bool isWin) {
+                            setState(() {
+                              if (isWin) {
+                                hasLost = 1;
+                              } else {
+                                hasLost = 2;
+                              }
+                              currentSongName = songName;
+                            });
+                          },
+                        ),
+                      if (hasLost == 2) // LoseScreen
                         LoseScreen(
-                          songName: 'Nazwa utworu',
+                          songName: currentSongName,
                           imagePath: 'URL obrazu',
                           onRetry: () {
                             setState(() {
                               hasLost = 0;
-                              screenState =
-                                  0; // Wróć do początkowego stanu/ekranu
+                              screenState = 0;
                             });
                           },
                         ),
-                      if (hasLost == 1)
+                      if (hasLost == 1) // WinScreen
                         WinScreen(
-                            songName: 'Nazwa utworu',
-                            imagePath: 'URL obrazu',
-                            onRetry: () {
-                              setState(() {
-                                hasLost = 0;
-                                screenState =
-                                    0; // Wróć do początkowego stanu/ekranu
-                              });
-                            }),
-
+                          songName: currentSongName,
+                          imagePath: 'URL obrazu',
+                          onRetry: () {
+                            setState(() {
+                              hasLost = 0;
+                              screenState = 0;
+                            });
+                          },
+                        ),
                       if (screenState >= 0)
                         SizedBox(
                           height: 150,
