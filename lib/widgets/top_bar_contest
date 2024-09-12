@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rapdle/authorization/login_screen.dart';
 import 'package:rapdle/authorization/register_screen.dart';
 
@@ -13,6 +15,28 @@ class TopBarContents extends StatefulWidget {
 }
 
 class _TopBarContentsState extends State<TopBarContents> {
+  User? _user;
+  String? _userName;
+
+  @override
+  void initState() {
+    super.initState();
+    _user = FirebaseAuth.instance.currentUser;
+    _fetchUserName(); // Pobierz nazwę użytkownika, jeśli jest zalogowany
+  }
+
+  Future<void> _fetchUserName() async {
+    if (_user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_user!.uid)
+          .get();
+      setState(() {
+        _userName = userDoc['username'] ?? 'Użytkownik';
+      });
+    }
+  }
+
   void _showLoginDialog() {
     showDialog(
       context: context,
@@ -21,7 +45,8 @@ class _TopBarContentsState extends State<TopBarContents> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: LoginScreen(onLogin: () {
             Navigator.of(context).pop();
-            // Add your login logic here
+            _user = FirebaseAuth.instance.currentUser;
+            _fetchUserName(); // Aktualizuj po zalogowaniu
           }),
         );
       },
@@ -36,23 +61,35 @@ class _TopBarContentsState extends State<TopBarContents> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: RegisterScreen(onRegister: () {
             Navigator.of(context).pop();
-            // Add your registration logic here
+            _user = FirebaseAuth.instance.currentUser;
+            _fetchUserName(); // Aktualizuj po rejestracji
           }),
         );
       },
     );
   }
 
+  void _logout() async {
+    await FirebaseAuth.instance.signOut();
+    setState(() {
+      _user = null;
+      _userName = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
+    bool isMobile = screenSize.width < 600; // Zmiany tylko dla ekranów poniżej 600px
 
     return PreferredSize(
       preferredSize: Size(screenSize.width, 70),
       child: Container(
         color: Colors.white.withOpacity(widget.opacity),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.only(
+              right: 15,
+              left: isMobile ? 20 : 40), // Padding od lewej tylko dla dużych ekranów
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -60,14 +97,13 @@ class _TopBarContentsState extends State<TopBarContents> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    SizedBox(width: screenSize.width / 10),
                     GestureDetector(
                       onTap: () => widget.onLogoClicked(),
                       child: Text(
                         'RAPdle',
                         style: TextStyle(
                           color: Color(0xFF424C55),
-                          fontSize: 28,
+                          fontSize: isMobile ? 20 : 28, // Zmiany tylko na mobile
                           fontFamily: 'MiniBananaDemoRegular',
                           fontWeight: FontWeight.w900,
                           letterSpacing: 3,
@@ -81,33 +117,163 @@ class _TopBarContentsState extends State<TopBarContents> {
                   ],
                 ),
               ),
-              // PopupMenu for login/register
-              PopupMenuButton<String>(
-                icon: CircleAvatar(
-                  backgroundColor: Colors.grey[300],
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.black,
+
+              // Jeśli użytkownik jest zalogowany, pokaż nazwę użytkownika
+              if (_user != null)
+                isMobile
+                    ? Column(
+                        // Dla mobilnych ekranów nazwa pod przyciskiem
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PopupMenuButton<String>(
+                            icon: CircleAvatar(
+                              backgroundColor: Colors.grey[300],
+                              radius: 12, // Zmiany tylko na mobile
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.black,
+                                size: 16, // Zmiany tylko na mobile
+                              ),
+                            ),
+                            onSelected: (value) {
+                              if (value == 'login') {
+                                _showLoginDialog();
+                              } else if (value == 'register') {
+                                _showRegisterDialog();
+                              } else if (value == 'logout') {
+                                _logout();
+                              } else if (value == 'stats') {
+                                // Placeholder dla statystyk
+                              }
+                            },
+                            itemBuilder: (context) {
+                              if (_user == null) {
+                                return [
+                                  PopupMenuItem(
+                                    value: 'login',
+                                    child: Text('Zaloguj się'),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'register',
+                                    child: Text('Zarejestruj się'),
+                                  ),
+                                ];
+                              } else {
+                                return [
+                                  PopupMenuItem(
+                                    value: 'stats',
+                                    child: Text('Statystyki'),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'logout',
+                                    child: Text('Wyloguj'),
+                                  ),
+                                ];
+                              }
+                            },
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              _userName ?? 'Użytkownik',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12, // Zmiany tylko na mobile
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        // Dla dużych ekranów (desktop) wszystko pozostaje jak wcześniej
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Text(
+                              _userName ?? 'Użytkownik',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          PopupMenuButton<String>(
+                            icon: CircleAvatar(
+                              backgroundColor: Colors.grey[300],
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.black,
+                              ),
+                            ),
+                            onSelected: (value) {
+                              if (value == 'login') {
+                                _showLoginDialog();
+                              } else if (value == 'register') {
+                                _showRegisterDialog();
+                              } else if (value == 'logout') {
+                                _logout();
+                              } else if (value == 'stats') {
+                                // Placeholder dla statystyk
+                              }
+                            },
+                            itemBuilder: (context) {
+                              if (_user == null) {
+                                return [
+                                  PopupMenuItem(
+                                    value: 'login',
+                                    child: Text('Zaloguj się'),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'register',
+                                    child: Text('Zarejestruj się'),
+                                  ),
+                                ];
+                              } else {
+                                return [
+                                  PopupMenuItem(
+                                    value: 'stats',
+                                    child: Text('Statystyki'),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'logout',
+                                    child: Text('Wyloguj'),
+                                  ),
+                                ];
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+
+              if (_user == null) // Gdy użytkownik nie jest zalogowany
+                PopupMenuButton<String>(
+                  icon: CircleAvatar(
+                    backgroundColor: Colors.grey[300],
+                    child: Icon(
+                      Icons.person,
+                      color: Colors.black,
+                    ),
                   ),
+                  onSelected: (value) {
+                    if (value == 'login') {
+                      _showLoginDialog();
+                    } else if (value == 'register') {
+                      _showRegisterDialog();
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'login',
+                      child: Text('Zaloguj się'),
+                    ),
+                    PopupMenuItem(
+                      value: 'register',
+                      child: Text('Zarejestruj się'),
+                    ),
+                  ],
                 ),
-                onSelected: (value) {
-                  if (value == 'login') {
-                    _showLoginDialog();
-                  } else if (value == 'register') {
-                    _showRegisterDialog();
-                  }
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 'login',
-                    child: Text('Zaloguj się'),
-                  ),
-                  PopupMenuItem(
-                    value: 'register',
-                    child: Text('Zarejestruj się'),
-                  ),
-                ],
-              ),
             ],
           ),
         ),
@@ -118,7 +284,7 @@ class _TopBarContentsState extends State<TopBarContents> {
   Widget _buildMenuItem(String title) {
     return InkWell(
       onTap: () {
-        // Add your on tap logic for menu items
+        // Dodaj logikę po kliknięciu elementu menu
       },
       child: Column(
         mainAxisSize: MainAxisSize.min,
