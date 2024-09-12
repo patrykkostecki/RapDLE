@@ -1,16 +1,20 @@
+import 'package:flutter/material.dart';
 import 'package:rapdle/widgets/bottom_bar_column.dart';
 import 'package:rapdle/widgets/info_text.dart';
-// import 'package:rapdle/widgets/responsive.dart';
-import 'package:flutter/material.dart';
 
 class BottomBar extends StatelessWidget {
   const BottomBar({
     super.key,
   });
+
   static const Color gradientStartColor = Color(0xff424C55);
   static const Color gradientEndColor = Color(0xffC9C5CA);
+
   @override
   Widget build(BuildContext context) {
+    // Sprawdza szerokość ekranu, aby ustalić, czy to telefon czy komputer
+    bool isSmallScreen = MediaQuery.of(context).size.width < 800;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(0.0)),
@@ -36,37 +40,61 @@ class BottomBar extends StatelessWidget {
       padding: EdgeInsets.all(30),
       child: Column(
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              BottomBarColumn(
-                heading: 'O NAS',
-                s1: 'Contact Us',
-                s2: 'About Us',
-                s3: 'Careers',
-              ),
-              Container(
-                color: Colors.white,
-                width: 2,
-                height: 150,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  InfoText(
-                    type: 'Email',
-                    text: '',
-                  ),
-                  SizedBox(height: 5),
-                  InfoText(
-                    type: 'Adres',
-                    text: '',
-                  )
-                ],
-              ),
-            ],
-          ),
+          // W zależności od szerokości ekranu układ zmienia się na kolumnę (na telefonach) lub wiersz (na komputerach)
+          isSmallScreen
+              ? Column(
+                  // Dla małych ekranów układ pionowy (kolumna)
+                  children: [
+                    BottomBarColumn(
+                      heading: 'rapDLE - guess rap song!',
+                      s1: 'Contact Us',
+                      s2: 'About Us',
+                      s3: 'Careers',
+                    ),
+                    SizedBox(height: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InfoText(
+                          type: 'Email',
+                          text: 'rapdle@gmail.com',
+                        ),
+                        SizedBox(height: 5),
+                        InfoText(
+                          type: 'Adres',
+                          text: 'Katowice',
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              : Row(
+                  // Dla dużych ekranów układ poziomy (wiersz)
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    BottomBarColumn(
+                      heading: 'rapDLE - guess rap song!',
+                      s1: 'Contact Us',
+                      s2: 'About Us',
+                      s3: 'Careers',
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InfoText(
+                          type: 'Email',
+                          text: 'rapdle@gmail.com',
+                        ),
+                        SizedBox(height: 5),
+                        InfoText(
+                          type: 'Adres',
+                          text: 'Katowice',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
           Divider(
             color: Colors.white,
           ),

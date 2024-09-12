@@ -7,6 +7,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:rapdle/widgets/responsive.dart';
 
 class GuessTheLyrics extends StatefulWidget {
   const GuessTheLyrics(
@@ -169,230 +170,239 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      heightFactor: 1,
-      child: Padding(
-        padding: EdgeInsets.only(
-          top: 100, // Stała wartość dla górnego paddingu
-          left: 50, // Stała wartość dla lewego paddingu
-          right: 50, // Stała wartość dla prawego paddingu
+    return ResponsiveWidget(
+      largeScreen: Center(
+        heightFactor: 1,
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 100,
+            left: 50,
+            right: 50,
+          ),
+          child: buildMainContainer(800, 650, 45),
         ),
-        child: Container(
-          width: 800,
-          height: 650, // Zmieniona wysokość na mniejszą
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Color.fromARGB(251, 39, 39, 39),
-              width: 4,
-            ),
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: [
-              BoxShadow(
-                color: Color(0xFFAC8115).withOpacity(0.4),
-                spreadRadius:
-                    30, // SpreadRadius większy, aby przypominał pierwsze okno
-                blurRadius:
-                    100, // BlurRadius większy, aby przypominał pierwsze okno
-                offset: Offset(0, 2),
-              ),
-            ],
-            gradient: RadialGradient(
-              colors: [
-                Color.fromARGB(236, 255, 255, 255), // Center color
-                Color.fromRGBO(161, 161, 161, 0.922), // Outer color
-              ],
-              center: Alignment.center,
-              radius: 2.5,
-            ),
+      ),
+      smallScreen: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 50,
+            left: 20,
+            right: 20,
+            bottom: 20,
           ),
-          child: ClipRRect(
+          child:
+              buildMainContainer(double.infinity, 600, 30), // Mniejsze ekrany
+        ),
+      ),
+    );
+  }
+
+  Widget buildMainContainer(double width, double height, double fontSize) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Color.fromARGB(251, 39, 39, 39),
+          width: 4,
+        ),
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0xFFAC8115).withOpacity(0.4),
+            spreadRadius: 30,
+            blurRadius: 100,
+            offset: Offset(0, 2),
+          ),
+        ],
+        gradient: RadialGradient(
+          colors: [
+            Color.fromARGB(236, 255, 255, 255),
+            Color.fromRGBO(161, 161, 161, 0.922),
+          ],
+          center: Alignment.center,
+          radius: 2.5,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: Card(
+          margin: EdgeInsets.zero,
+          color: Colors.transparent,
+          elevation: 20,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
-            child: Card(
-              margin: EdgeInsets.zero,
-              color: Colors.transparent,
-              elevation: 20,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Odgadnij tekst piosenki',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 45,
-                        fontFamily: 'CrayonPaperDemoRegular',
-                      ),
-                    ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal:
-                              45.0), // Adjust horizontal padding as needed
-                      child: Text(
-                        'Po wejściu do ramki zobaczysz pierwszy wers tekstu. '
-                        'Kiedy rozpoznasz piosenkę, wpisz jej tytuł (bądź wybierz z rozwijanej listy) w pasku wyboru i kliknij "Zatwierdź".\n\n'
-                        'Jeśli nie rozpoznasz po pierwszym wersie, również kliknij "Zatwierdź". '
-                        'Pojawi sie wtedy kolejny wers i tak aż do 4 \n\nMasz łącznie 4 próby!\n',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Container(
-                      width: 450,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 2.0, // Grubość ramki ustawiona na 4.0
-                        ),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      padding: EdgeInsets.all(10),
-                      child: Center(
-                        child: Text(
-                          _currentLyrics,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      'Ilość prób: $_attempts',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(_message),
-                    SizedBox(height: 5),
-                    Container(
-                      width: 550,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 60,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: TypeAheadFormField(
-                        textFieldConfiguration: TextFieldConfiguration(
-                          controller: _textController,
-                          decoration: InputDecoration(
-                            hintText: "Wpisz nazwę piosenki...",
-                            hintStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.black,
-                                width: 2.0,
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.black,
-                                width: 2.0,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Color.fromARGB(255, 0, 7, 73),
-                                width: 2.0,
-                              ),
-                            ),
-                          ),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        suggestionsCallback: (pattern) async {
-                          return await getSuggestions(pattern);
-                        },
-                        itemBuilder: (context, suggestion) {
-                          return ListTile(
-                            title: Text(
-                              suggestion,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          );
-                        },
-                        onSuggestionSelected: (suggestion) {
-                          _textController.text = suggestion;
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          onPressed: _checkAnswer,
-                          child: Container(
-                            height: 50.0,
-                            width: 150.0,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Color.fromARGB(211, 0, 99, 0),
-                                  Color.fromARGB(210, 0, 78, 0),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(30.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.8),
-                                  blurRadius: 30,
-                                  offset: Offset(0, 10),
-                                ),
-                              ],
-                              border: Border.all(
-                                color: Color.fromARGB(172, 32, 32, 32),
-                                width: 2,
-                              ),
-                            ),
-                            child: Text(
-                              'Zatwierdź',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                                color: Color.fromARGB(255, 230, 230, 230),
-                              ),
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: 20),
+                Text(
+                  'Odgadnij tekst piosenki',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: fontSize, // Dynamiczny rozmiar tekstu
+                    fontFamily: 'CrayonPaperDemoRegular',
+                  ),
                 ),
+                SizedBox(height: 15),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 45.0),
+                ),
+                SizedBox(height: 10),
+                buildLyricsDisplay(),
+                SizedBox(height: 10),
+                Text(
+                  'Ilość prób: $_attempts',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(_message),
+                SizedBox(height: 5),
+                buildInputField(),
+                SizedBox(height: 20),
+                buildSubmitButton(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildLyricsDisplay() {
+    return Container(
+      width: 450,
+      height: 150,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.black,
+          width: 2.0,
+        ),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      padding: EdgeInsets.all(10),
+      child: Center(
+        child: Text(
+          _currentLyrics,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  Widget buildInputField() {
+    return Container(
+      width: 550,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 60,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      child: TypeAheadFormField(
+        textFieldConfiguration: TextFieldConfiguration(
+          controller: _textController,
+          decoration: InputDecoration(
+            hintText: "Wpisz nazwę piosenki...",
+            hintStyle: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.black,
+                width: 2.0,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.black,
+                width: 2.0,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Color.fromARGB(255, 0, 7, 73),
+                width: 2.0,
               ),
             ),
           ),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        suggestionsCallback: (pattern) async {
+          return await getSuggestions(pattern);
+        },
+        itemBuilder: (context, suggestion) {
+          return ListTile(
+            title: Text(
+              suggestion,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          );
+        },
+        onSuggestionSelected: (suggestion) {
+          _textController.text = suggestion;
+        },
+      ),
+    );
+  }
+
+  Widget buildSubmitButton() {
+    return ElevatedButton(
+      onPressed: _checkAnswer,
+      child: Container(
+        height: 50.0,
+        width: 150.0,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color.fromARGB(211, 0, 99, 0),
+              Color.fromARGB(210, 0, 78, 0),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(30.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.8),
+              blurRadius: 30,
+              offset: Offset(0, 10),
+            ),
+          ],
+          border: Border.all(
+            color: Color.fromARGB(172, 32, 32, 32),
+            width: 2,
+          ),
+        ),
+        child: Text(
+          'Zatwierdź',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            color: Color.fromARGB(255, 230, 230, 230),
+          ),
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.zero,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30.0),
         ),
       ),
     );

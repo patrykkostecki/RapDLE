@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rapdle/widgets/responsive.dart';
 import 'package:lottie/lottie.dart';
 
 class WinScreen extends StatelessWidget {
@@ -15,17 +16,36 @@ class WinScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ResponsiveWidget(
+      largeScreen: buildMainContent(800, 45, 25, 35), // Dla dużych ekranów
+      smallScreen: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 50,
+            left: 20,
+            right: 20,
+            bottom: 20,
+          ),
+          child: buildMainContent(
+              double.infinity, 30, 20, 28), // Dla małych ekranów
+        ),
+      ),
+    );
+  }
+
+  Widget buildMainContent(double width, double titleFontSize,
+      double textFontSize, double songFontSize) {
     return Center(
       heightFactor: 1,
       child: Padding(
         padding: EdgeInsets.only(
-          top: 100, // Stała wartość dla górnego paddingu
-          left: 50, // Stała wartość dla lewego paddingu
-          right: 50, // Stała wartość dla prawego paddingu
+          top: 100,
+          left: 50,
+          right: 50,
         ),
         child: Container(
-          width: 800,
-          height: 800, // Zmieniona wysokość na mniejszą
+          width: width,
+          height: 800,
           decoration: BoxDecoration(
             border: Border.all(
               color: Color.fromARGB(251, 39, 39, 39),
@@ -35,10 +55,8 @@ class WinScreen extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 color: Color(0xFFAC8115).withOpacity(0.4),
-                spreadRadius:
-                    30, // SpreadRadius większy, aby przypominał pierwsze okno
-                blurRadius:
-                    100, // BlurRadius większy, aby przypominał pierwsze okno
+                spreadRadius: 30,
+                blurRadius: 100,
                 offset: Offset(0, 2),
               ),
             ],
@@ -69,21 +87,20 @@ class WinScreen extends StatelessWidget {
                       'Wygrałes',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 45,
+                        fontSize:
+                            titleFontSize, // Dynamiczny rozmiar tekstu tytułu
                         fontFamily: 'CrayonPaperDemoRegular',
                       ),
                     ),
                     SizedBox(height: 15),
                     Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal:
-                              30.0), // Adjust horizontal padding as needed
+                      padding: EdgeInsets.symmetric(horizontal: 30.0),
                       child: Text(
                         'Gratulacje! Udało Ci się odgadnąć piosenkę.\nSpróbuj odgadnąć kolejną jutro!',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 25,
+                          fontSize: textFontSize, // Dynamiczny rozmiar tekstu
                         ),
                       ),
                     ),
@@ -95,14 +112,15 @@ class WinScreen extends StatelessWidget {
                       'Taaaaaak! Jest to:',
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        fontSize: 20,
+                        fontSize: textFontSize,
                       ),
                     ),
                     Text(
                       songName,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 35,
+                        fontSize:
+                            songFontSize, // Dynamiczny rozmiar tekstu piosenki
                       ),
                     ),
                     SizedBox(height: 20),

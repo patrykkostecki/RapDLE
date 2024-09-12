@@ -31,7 +31,7 @@ class FeaturedHeading extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              'Zobacz co dodalismy w tym tygodniu',
+              'Dodane',
               textAlign: TextAlign.end,
               style:
                   TextStyle(fontFamily: 'MiniBananaDemoRegular', fontSize: 20),

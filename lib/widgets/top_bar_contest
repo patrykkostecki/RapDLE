@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rapdle/authorization/login_screen.dart';
+import 'package:rapdle/authorization/register_screen.dart';
 
 class TopBarContents extends StatefulWidget {
   final double opacity;
@@ -10,33 +12,35 @@ class TopBarContents extends StatefulWidget {
   _TopBarContentsState createState() => _TopBarContentsState();
 }
 
-class _TopBarContentsState extends State<TopBarContents> with SingleTickerProviderStateMixin {
-  final List<bool> _isHovering = List.filled(8, false);
-  late AnimationController _animationController;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 200));
-    _animation = Tween<double>(begin: 1.0, end: 1.2).animate(_animationController);
+class _TopBarContentsState extends State<TopBarContents> {
+  void _showLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: LoginScreen(onLogin: () {
+            Navigator.of(context).pop();
+            // Add your login logic here
+          }),
+        );
+      },
+    );
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  void _handleHover(bool hovering) {
-    setState(() {
-      _isHovering[0] = hovering;
-    });
-    if (_isHovering[0]) {
-      _animationController.forward();
-    } else {
-      _animationController.reverse();
-    }
+  void _showRegisterDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: RegisterScreen(onRegister: () {
+            Navigator.of(context).pop();
+            // Add your registration logic here
+          }),
+        );
+      },
+    );
   }
 
   @override
@@ -57,115 +61,84 @@ class _TopBarContentsState extends State<TopBarContents> with SingleTickerProvid
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     SizedBox(width: screenSize.width / 10),
-                    MouseRegion(
-                      onEnter: (_) => _handleHover(true),
-                      onExit: (_) => _handleHover(false),
-                      child: GestureDetector(
-                        onTap: () => widget.onLogoClicked(),
-                        child: ScaleTransition(
-                          scale: _animation,
-                          child: Text(
-                            'RAPdle',
-                            style: TextStyle(
-                              color: Color(0xFF424C55),
-                              fontSize: 28,
-                              fontFamily: 'MiniBananaDemoRegular',
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 3,
-                            ),
-                          ),
+                    GestureDetector(
+                      onTap: () => widget.onLogoClicked(),
+                      child: Text(
+                        'RAPdle',
+                        style: TextStyle(
+                          color: Color(0xFF424C55),
+                          fontSize: 28,
+                          fontFamily: 'MiniBananaDemoRegular',
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 3,
                         ),
                       ),
                     ),
-
                     SizedBox(width: screenSize.width / 15),
-                    InkWell(
-                      onHover: (value) {
-                        setState(() {
-                          value
-                              ? _isHovering[1] = true
-                              : _isHovering[1] = false;
-                        });
-                      },
-                      onTap: () {},
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'POPdle',
-                            style: TextStyle(
-                                color: _isHovering[1]
-                                    ? Color(0xFF424C55)
-                                    : Color(0xFF424C55),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                fontFamily: 'MiniBananaDemoRegular',
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Visibility(
-                            maintainAnimation: true,
-                            maintainState: true,
-                            maintainSize: true,
-                            visible: _isHovering[1],
-                            child: Container(
-                              height: 2,
-                              width: 20,
-                              color: Color(0xFF424C55),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
+                    _buildMenuItem('POPdle'),
                     SizedBox(width: screenSize.width / 15),
-                    InkWell(
-                      onHover: (value) {
-                        setState(() {
-                          value
-                              ? _isHovering[2] = true
-                              : _isHovering[2] = false;
-                        });
-                      },
-                      onTap: () {},
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'ROCKdle',
-                            style: TextStyle(
-                                color: _isHovering[2]
-                                    ? Color(0xFF424C55)
-                                    : Color(0xFF424C55),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                fontFamily: 'MiniBananaDemoRegular',
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Visibility(
-                            maintainAnimation: true,
-                            maintainState: true,
-                            maintainSize: true,
-                            visible: _isHovering[2],
-                            child: Container(
-                              height: 2,
-                              width: 20,
-                              color: Color(0xFF424C55),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: screenSize.width / 15),
-
-
+                    _buildMenuItem('ROCKdle'),
                   ],
                 ),
               ),
-
+              // PopupMenu for login/register
+              PopupMenuButton<String>(
+                icon: CircleAvatar(
+                  backgroundColor: Colors.grey[300],
+                  child: Icon(
+                    Icons.person,
+                    color: Colors.black,
+                  ),
+                ),
+                onSelected: (value) {
+                  if (value == 'login') {
+                    _showLoginDialog();
+                  } else if (value == 'register') {
+                    _showRegisterDialog();
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'login',
+                    child: Text('Zaloguj się'),
+                  ),
+                  PopupMenuItem(
+                    value: 'register',
+                    child: Text('Zarejestruj się'),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(String title) {
+    return InkWell(
+      onTap: () {
+        // Add your on tap logic for menu items
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: Color(0xFF424C55),
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+              fontFamily: 'MiniBananaDemoRegular',
+            ),
+          ),
+          SizedBox(height: 5),
+          Container(
+            height: 2,
+            width: 20,
+            color: Color(0xFF424C55),
+          ),
+        ],
       ),
     );
   }
