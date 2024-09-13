@@ -240,7 +240,7 @@ class _GuessTheLyricsState extends State<GuessTheLyrics>
               children: [
                 SizedBox(height: 20),
                 Text(
-                  'Odgadnij tekst piosenki',
+                  'Guess lyriC',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: fontSize, // Dynamiczny rozmiar tekstu

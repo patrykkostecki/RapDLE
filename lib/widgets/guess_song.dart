@@ -218,7 +218,7 @@ class _GuessTheSongState extends State<GuessTheSong>
                   children: [
                     SizedBox(height: 20),
                     Text(
-                      'Odgadnij piosenkę po dzwieku',
+                      'Guess daily songG',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 45,
@@ -493,7 +493,7 @@ class _GuessTheSongState extends State<GuessTheSong>
                   children: [
                     SizedBox(height: 10),
                     Text(
-                      'Odgadnij piosenkę po dźwięku',
+                      'Guess daily sonS',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 25,

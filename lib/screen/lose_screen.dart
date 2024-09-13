@@ -96,7 +96,7 @@ class LoseScreen extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 30.0),
                       child: Text(
-                        'Niestety nie udało ci się ;c.\n Pamiętaj, że zawsze możesz spróbować ponownie!',
+                        'Niestety nie udało ci się ;c.\n Pamiętaj, że zawsze możesz spróbować ponownie jutro!',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -153,7 +153,7 @@ class LoseScreen extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          'Spróbuj ponownie',
+                          'Okej',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w500,

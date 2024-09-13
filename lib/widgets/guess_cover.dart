@@ -265,7 +265,7 @@ class _GuessTheCoverState extends State<GuessTheCover> {
       children: [
         SizedBox(height: 20),
         Text(
-          'Odgadnij okładkę albumu',
+          'Guess coveR',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 25, // Smaller font size for mobile

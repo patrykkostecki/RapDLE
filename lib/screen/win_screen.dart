@@ -96,7 +96,7 @@ class WinScreen extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 30.0),
                       child: Text(
-                        'Gratulacje! Udało Ci się odgadnąć piosenkę.\nSpróbuj odgadnąć kolejną jutro!',
+                        'Gratulacje! Udało Ci się piosenkę.\nSpróbuj odgadnąć kolejną jutro!',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -153,7 +153,7 @@ class WinScreen extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          'Kolejna Piosenka!',
+                          'Okej!',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w500,

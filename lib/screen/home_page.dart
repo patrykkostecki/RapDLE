@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rapdle/choose_screens/choose_song.dart';
+import 'package:rapdle/normal_guessers/guess_song.dart';
 import 'package:rapdle/screen/win_screen.dart';
 import 'package:rapdle/widgets/bottom_bar.dart';
 import 'package:rapdle/widgets/featured_heading.dart';
@@ -9,6 +11,7 @@ import 'package:rapdle/widgets/guess_song.dart';
 import 'package:rapdle/screen/lose_screen.dart';
 import 'package:rapdle/widgets/guess_text.dart';
 import 'package:rapdle/widgets/top_bar_contest';
+import 'package:rapdle/widgets/top_bar_contest.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -20,7 +23,6 @@ class _HomePageState extends State<HomePage> {
   double _scrollPosition = 0;
   double _opacity = 0;
   int screenState = 0;
-  String path = '/Users/a1234/Desktop/Aplikacje/RapDLE/rapdle/assets';
   int hasLost = 0;
   String currentSongName = '';
 
@@ -60,8 +62,9 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: PreferredSize(
-            preferredSize: Size(screenSize.width, 70),
-            child: TopBarContents(_opacity, onLogoClicked: resetGameState)),
+          preferredSize: Size(screenSize.width, 70),
+          child: TopBarContents(_opacity, onLogoClicked: resetGameState),
+        ),
         backgroundColor: Color(0xFFC9C5CA),
         body: SingleChildScrollView(
           child: Column(
@@ -94,7 +97,23 @@ class _HomePageState extends State<HomePage> {
                         SizedBox(
                           height: 50,
                         ),
-                      if (screenState == 1 && hasLost == 0) // GuessTheSong
+                      if (screenState == 1 &&
+                          hasLost == 0) // Wyświetlanie opcji piosenek
+                        SongOptionsWidget(
+                          onDailySongSelected: () {
+                            setState(() {
+                              screenState = 4; // Daily Song
+                            });
+                          },
+                          onSongGuesserSelected: () {
+                            setState(() {
+                              screenState = 5; // Random Song Guesser
+                            });
+                          },
+                        ),
+                      if (screenState == 4 &&
+                          hasLost ==
+                              0) // Wyświetlanie GuessTheSong (Daily Song)
                         GuessTheSong(
                           screenSize: screenSize,
                           onLose: (String songName, bool isWin) {
@@ -107,6 +126,12 @@ class _HomePageState extends State<HomePage> {
                               currentSongName = songName;
                             });
                           },
+                        ),
+                      if (screenState == 5 &&
+                          hasLost ==
+                              0) // Wyświetlanie GuessRandomSong (Random Song Guesser)
+                        GuessRandomSong(
+                          screenSize: screenSize,
                         ),
                       if (screenState == 2 && hasLost == 0) // GuessTheLyrics
                         GuessTheLyrics(
@@ -169,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       BottomBar(),
                     ],
-                  )
+                  ),
                 ],
               ),
             ],
