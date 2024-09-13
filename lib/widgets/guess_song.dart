@@ -234,7 +234,7 @@ class _GuessTheSongState extends State<GuessTheSong>
                               45.0), // Adjust horizontal padding as needed
                       child: Text(
                         'Kliknij przycisk "Odtwórz", aby odtworzyć fragment piosenki. '
-                        'Kiedy rozpoznasz piosenkę, wpisz jej tytuł (bądź wybierz z rozwijanej listy) w pasku wyboru i kliknij "Zatwierdź".\n\n'
+                        'Odgadnij dzienny utwór i załap się do statystyk najlepszych graczy!".\n\n'
                         'Masz łącznie 5 prób!',
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -493,7 +493,7 @@ class _GuessTheSongState extends State<GuessTheSong>
                   children: [
                     SizedBox(height: 10),
                     Text(
-                      'Guess daily sonS',
+                      'Guess daily sonG',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 25,
@@ -503,7 +503,7 @@ class _GuessTheSongState extends State<GuessTheSong>
                     SizedBox(height: 10),
                     Text(
                       'Kliknij przycisk "Odtwórz", aby odtworzyć fragment piosenki. '
-                      'Kiedy rozpoznasz piosenkę, wpisz jej tytuł w pasku wyboru i kliknij "Zatwierdź".\n\n'
+                      'Odgadnij dzienny utwór i załap się do statystyk najlepszych graczy!".\n\n'
                       'Masz łącznie 5 prób!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
